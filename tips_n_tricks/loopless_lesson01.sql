@@ -73,6 +73,16 @@ SET STATISTICS IO ON
 /*
 	y values 10 to 100 multiples of 10
 */
+SELECT
+	n AS y_itr
+FROM numbers
+WHERE
+	-- init
+	n >0 AND -- starting point 
+	-- upper limit
+	n < 110 AND 
+	-- step 
+	n %10 = 0 -- multiples of 10, instead of add 10
 
 
 /*
@@ -81,20 +91,81 @@ SET STATISTICS IO ON
    whe acutaly want the cartiesan product
    all combinations y_itr,x_itr
 */
+-- option A
+SELECT
+	yloop.y_itr,
+	xloop.x_itr,
+	(1.0*(xloop.x_itr)+5)/(yloop.y_itr ) AS calc
+FROM 
+	(SELECT n AS y_itr FROM numbers WHERE n >0 AND n < 110 AND n %10 = 0) AS yloop,
+		(SELECT n AS x_itr FROM numbers WHERE n >0 AND n < 110 AND n %10 = 0) AS xloop
 
+--option B
+SELECT
+	yloop.n AS y_itr,
+	xloop.n AS x_itr,
+	(1.0*(xloop.N)+5)/(yloop.N ) AS calc
+FROM 
+	numbers AS yloop,
+		numbers AS xloop
+WHERE
+	(yloop.n >0 AND yloop.n < 110 AND yloop.n %10 = 0 )
+		AND
+		(xloop.n >0 AND xloop.n < 110 AND xloop.n %10 = 0)
 
 
 /*
 	we don't want the bottom half of the line x=y
 */
-
+SELECT
+	xloop.N AS x_itr,
+	yloop.N AS y_itr,
+	(1.0*(xloop.N)+5)/(yloop.N ) AS calc
+FROM  dbo.numbers AS yloop
+CROSS JOIN dbo.numbers AS xloop -- new syntax for "FROM  numbers AS yloop, numbers AS xloop"
+WHERE
+	(yloop.n >0 AND yloop.n < 110 AND yloop.n % 10 = 0) AND
+	(xloop.n >0 AND xloop.n < 110 AND xloop.n % 10 = 0) AND 
+	xloop.n <= yloop.n
+--ORDER BY -- debug: so we can varify the data is expected
+--	x_itr,
+--	y_itr;
 
 
 /* 
 	move the factor of 10 to the output side
 */
+SELECT
+	10*xloop.N AS x_itr,
+	10*yloop.N AS y_itr,
+	((10.*xloop.N)+5)/(10*yloop.N ) AS calc
+FROM numbers AS yloop
+CROSS JOIN numbers AS xloop 
+WHERE
+	xloop.n >0 AND xloop.n < 11 AND 
+	yloop.n >0 AND yloop.n < 11 AND
+	xloop.n <= yloop.n;
 
 
+/*
+	readablity, at least for DBAs
+*/
+WITH itrations(itr) AS (
+	SELECT N  FROM numbers WHERE N > 0 AND N <11
+)	
+SELECT
+	scale.x_itr,
+	scale.y_itr,
+	1.0*(scale.x_itr+5)/scale.y_itr AS calc
+FROM  itrations AS yloop
+CROSS JOIN itrations AS xloop
+CROSS APPLY ( 
+	SELECT 
+		10*xloop.itr AS x_itr,
+		10*yloop.itr AS y_itr
+)AS scale(x_itr, y_itr)
+WHERE
+	xloop.itr <= yloop.itr;
 
 /* clean up */
 DROP TABLE numbers

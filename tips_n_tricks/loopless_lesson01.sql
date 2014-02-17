@@ -31,7 +31,7 @@ FROM Nums
 ORDER BY n
 OPTION( MAXDOP 1 ); 
 
-SELECT
+
 /*
 Some table_1 of XFactor v. YFactor results in some business metric
 	( F(x,y)=value for software)

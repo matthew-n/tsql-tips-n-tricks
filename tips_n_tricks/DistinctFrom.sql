@@ -110,6 +110,7 @@ WHERE
 
 -- INTERSECT:
 -- Correct results in a compact form
+-- uses "IS" operator for comparision
 SELECT
 	*
 FROM
@@ -125,6 +126,7 @@ WHERE
 
 -- NOT EXISTS:
 -- Same query plan, but different results!
+-- uses "EQ" operator for comparision
 
 SELECT
 	*
@@ -140,3 +142,20 @@ WHERE
 					t.ival = s.ival AND
 					t.cval = s.cval AND
 					t.mval = s.mval )
+
+
+--- Except versions:
+--- from post may produce 'less optimal plans'
+SELECT
+	*
+FROM
+	@Set1 AS t
+JOIN @Set2 AS s
+ON	s.pk = t.pk
+WHERE
+	EXISTS ( SELECT
+				s.*
+			EXCEPT
+			SELECT
+				t.* )
+

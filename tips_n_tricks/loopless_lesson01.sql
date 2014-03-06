@@ -1,6 +1,8 @@
 /*
  Descriptions: Removing loops 1
  Author: Matthew Naul
+
+ Backgroud: Directed a programers with little exprenece in advanceds TSql Tricks
 */
 
 USE tempdb;
@@ -131,7 +133,6 @@ WHERE
 --	x_itr,
 --	y_itr;
 
-
 /* 
 	move the factor of 10 to the output side
 */
@@ -150,22 +151,21 @@ WHERE
 /*
 	readablity, at least for DBAs
 */
-WITH itrations(itr) AS (
-	SELECT N  FROM numbers WHERE N > 0 AND N <11
-)	
 SELECT
 	scale.x_itr,
 	scale.y_itr,
-	1.0*(scale.x_itr+5)/scale.y_itr AS calc
-FROM  itrations AS yloop
-CROSS JOIN itrations AS xloop
+	(scale.x_itr+5)/(scale.y_itr) AS calc
+FROM numbers AS yloop
+CROSS JOIN numbers AS xloop 
 CROSS APPLY ( 
 	SELECT 
 		10*xloop.itr AS x_itr,
 		10*yloop.itr AS y_itr
 )AS scale(x_itr, y_itr)
 WHERE
-	xloop.itr <= yloop.itr;
+	xloop.n >0 AND xloop.n < 11 AND 
+	yloop.n >0 AND yloop.n < 11 AND
+	xloop.n <= yloop.n;
 
 /* clean up */
 DROP TABLE numbers

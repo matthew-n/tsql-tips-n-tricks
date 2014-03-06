@@ -1,3 +1,9 @@
+/*
+ Descriptions: A T-SQL implementation of Sierpinski's Triangles, just to see if I could do it.
+ Inspired by:  Alastair Aitchison SQLCLR implementation http://alastaira.wordpress.com/2012/03/06/drawing-fractals-with-sql-server-spatial/ 
+ Author: Mattehw Naul
+*/
+
 DECLARE 
 	@itrations INT = 12,
 	@seed geometry = geometry::STGeomFromText ('LINESTRING (9 12, 0 0, 18 0, 9 12)',0);
